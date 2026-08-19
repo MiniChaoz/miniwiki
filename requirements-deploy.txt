@@ -1,3 +1,3 @@
 # Nur fuer die optionalen Server-Deploy-Skripte (deploy.py / deploy_update.py).
 # Die App selbst braucht das NICHT.
-paramiko==3.4.0
+paramiko==5.0.0
