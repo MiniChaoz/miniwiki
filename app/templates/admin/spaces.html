@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Bereiche – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="page-head">
+  <h1>Bereiche</h1>
+  <a class="btn" href="{{ url_for('admin.new_space') }}">+ Neuer Bereich</a>
+</div>
+
+<table class="data">
+  <thead>
+    <tr><th>Bereich</th><th>Standardzugriff</th><th>Seiten</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for s, depth in ordered %}
+    <tr>
+      <td>
+        <span style="padding-left:{{ depth * 22 }}px">{% if depth %}<span class="muted">↳ </span>{% endif %}<strong>{{ s.name }}</strong></span>
+        <span class="small muted">/{{ s.slug }}</span>
+        {% if s.description %}<div class="small muted" style="padding-left:{{ depth * 22 }}px">{{ s.description }}</div>{% endif %}
+      </td>
+      <td><span class="badge access-{{ s.default_access }}">{{ s.default_access_label }}</span></td>
+      <td>{{ counts[s.id] }}</td>
+      <td class="actions">
+        <form method="post" action="{{ url_for('admin.reorder_space', space_id=s.id, direction='up') }}" style="display:inline;margin:0">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn-small" title="Nach oben">↑</button>
+        </form>
+        <form method="post" action="{{ url_for('admin.reorder_space', space_id=s.id, direction='down') }}" style="display:inline;margin:0">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn-small" title="Nach unten">↓</button>
+        </form>
+        <a class="btn-small" href="{{ url_for('admin.new_space', parent=s.id) }}">+ Unterbereich</a>
+        <a class="btn-small" href="{{ url_for('admin.space_members', space_id=s.id) }}">Zugriffe</a>
+        <a class="btn-small" href="{{ url_for('admin.edit_space', space_id=s.id) }}">Bearbeiten</a>
+        <form method="post" action="{{ url_for('admin.delete_space', space_id=s.id) }}"
+              onsubmit="return confirm('Bereich samt allen Seiten wirklich löschen? Unterbereiche rücken eine Ebene nach oben.');" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn-small" style="color:var(--danger-fg)">Löschen</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="muted">Noch keine Bereiche.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

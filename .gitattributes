@@ -1,0 +1,5 @@
+# Einheitliche Zeilenenden: LF fuer Text (wichtig fuer install.sh unter Linux)
+* text=auto eol=lf
+
+# Windows-Skripte mit CRLF
+*.ps1 text eol=crlf

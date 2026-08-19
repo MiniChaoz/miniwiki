@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ space.name }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ space.name }}</h1>
+    {% if space.description %}<div class="muted">{{ space.description }}</div>{% endif %}
+  </div>
+  <div class="actions">
+    {% if can_admin %}
+      <a class="btn-ghost" href="{{ url_for('admin.new_space', parent=space.id) }}">+ Unterbereich</a>
+    {% endif %}
+    {% if can_write %}
+      <a class="btn" href="{{ url_for('wiki.new_page', space_slug=space.slug) }}">+ Neue Seite</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if child_spaces %}
+<h3 style="margin-top:18px">Unterbereiche</h3>
+<div class="grid">
+  {% for c in child_spaces %}
+  <a class="card" href="{{ url_for('wiki.space', space_slug=c.slug) }}" style="color:var(--text)">
+    <h3 style="margin:0 0 4px">📂 {{ c.name }}</h3>
+    <div class="small muted">{{ c.description or '' }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if pages %}
+{% if child_spaces %}<h3 style="margin-top:18px">Seiten</h3>{% endif %}
+<table class="data" style="margin-top:14px">
+  <tbody>
+    {% for p in pages %}
+    <tr>
+      <td>
+        <a href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=p.slug) }}">{{ p.title }}</a>
+        <div class="small muted">{{ excerpt(p.content, 110) }}</div>
+      </td>
+      <td class="small muted" style="white-space:nowrap">{{ p.updated_at.strftime('%d.%m.%Y') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% elif not child_spaces %}
+<div class="card muted">
+  Noch keine Seiten in diesem Bereich.
+  {% if can_write %}<a href="{{ url_for('wiki.new_page', space_slug=space.slug) }}">Erste Seite anlegen →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

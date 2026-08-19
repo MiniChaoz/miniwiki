@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Letzte Änderungen – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>🕑 Letzte Änderungen</h1></div>
+<p class="muted small">Die letzten Bearbeitungen in allen Bereichen, die du sehen darfst.</p>
+
+{% if revs %}
+<table class="data">
+  <thead>
+    <tr><th>Zeitpunkt</th><th>Seite</th><th>Bereich</th><th>Wer</th><th>Notiz</th></tr>
+  </thead>
+  <tbody>
+    {% for r in revs %}
+    <tr>
+      <td class="small muted" style="white-space:nowrap">{{ r.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+      <td>
+        <a href="{{ url_for('wiki.page', space_slug=r.page.space.slug, page_slug=r.page.slug) }}">{{ r.page.title }}</a>
+        <a class="small muted" href="{{ url_for('wiki.revision', space_slug=r.page.space.slug, page_slug=r.page.slug, rev_id=r.id) }}">· diese Version</a>
+      </td>
+      <td class="small muted">{{ r.page.space.name }}</td>
+      <td class="small">{{ r.author.name if r.author else '—' }}</td>
+      <td class="small muted">{{ r.comment or '' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card muted">Noch keine Änderungen vorhanden.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Übersicht – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>👋 Willkommen{{ ', ' ~ current_user.name if current_user.name else '' }}</h1>
+  <button class="btn-ghost" onclick="window.__openPalette && window.__openPalette()">🔍 Schnellsuche <span class="kbd">Strg K</span></button>
+</div>
+
+{% if favorites %}
+<h3>★ Favoriten</h3>
+<div class="grid">
+  {% for p in favorites %}
+  <a class="card tile" href="{{ url_for('wiki.page', space_slug=p.space.slug, page_slug=p.slug) }}">
+    <div class="tile-title">★ {{ p.title }}</div>
+    <div class="small muted">{{ p.space.name }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if recents %}
+<h3 style="margin-top:22px">🕒 Zuletzt angesehen</h3>
+<div class="chips">
+  {% for p in recents %}
+    <a class="chip-link" href="{{ url_for('wiki.page', space_slug=p.space.slug, page_slug=p.slug) }}">{{ p.title }}<span class="muted"> · {{ p.space.name }}</span></a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h3 style="margin-top:22px">📚 Bereiche</h3>
+{% if top_tiles %}
+<div class="grid tiles">
+  {% for t in top_tiles %}
+  <div class="card tile">
+    <a href="{{ url_for('wiki.space', space_slug=t.space.slug) }}" class="tile-main">
+      <div class="tile-title">📚 {{ t.space.name }}</div>
+      <div class="small muted">{{ t.space.description or '' }}</div>
+      <div class="tile-count">{{ t.count }} Seite{{ '' if t.count == 1 else 'n' }}</div>
+    </a>
+    {% if t.subspaces %}
+    <div class="tile-subs">
+      {% for c in t.subspaces %}
+        <a class="chip-link" href="{{ url_for('wiki.space', space_slug=c.slug) }}">{{ c.name }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card muted">Dir wurde noch kein Bereich freigegeben.
+  {% if current_user.is_admin %}<a href="{{ url_for('admin.new_space') }}">Ersten Bereich anlegen →</a>{% endif %}
+</div>
+{% endif %}
+
+{% if recent %}
+<h3 style="margin-top:22px">✏️ Zuletzt bearbeitet</h3>
+<table class="data">
+  <tbody>
+    {% for p in recent %}
+    <tr>
+      <td><a href="{{ url_for('wiki.page', space_slug=p.space.slug, page_slug=p.slug) }}">{{ p.title }}</a>
+        <div class="small muted">{{ excerpt(p.content, 90) }}</div>
+      </td>
+      <td class="small muted" style="white-space:nowrap">{{ p.space.name }}</td>
+      <td class="small muted" style="white-space:nowrap">{{ p.updated_at.strftime('%d.%m.%Y %H:%M') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

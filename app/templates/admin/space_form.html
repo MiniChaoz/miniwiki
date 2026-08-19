@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Bereich bearbeiten' if space else 'Neuer Bereich' }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="page-head"><h1>{{ 'Bereich bearbeiten' if space else 'Neuer Bereich' }}</h1></div>
+
+<div class="card" style="max-width:520px">
+<form method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="form-row">
+    {{ form.name.label }} {{ form.name() }}
+    {% for e in form.name.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="form-row">
+    {{ form.slug.label }} {{ form.slug(placeholder="wird sonst aus dem Namen erzeugt") }}
+    {% for e in form.slug.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="form-row">
+    {{ form.parent_id.label }} {{ form.parent_id() }}
+    <div class="small muted">Ordnet diesen Bereich als Unterbereich ein. Rechte gelten trotzdem je Bereich einzeln.</div>
+  </div>
+  <div class="form-row">
+    {{ form.description.label }} {{ form.description(style="min-height:80px") }}
+  </div>
+  <div class="form-row">
+    {{ form.default_access.label }} {{ form.default_access() }}
+    <div class="small muted">
+      Gilt für alle eingeloggten Nutzer <em>ohne</em> eigene Ausnahme.<br>
+      „Kein Zugriff" = privat, nur wer explizit freigeschaltet ist.
+    </div>
+  </div>
+  <div class="actions">
+    {{ form.submit(class="btn") }}
+    <a class="btn-ghost" href="{{ url_for('admin.spaces') }}">Abbrechen</a>
+  </div>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Verlauf: {{ page.title }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('wiki.space', space_slug=space.slug) }}">{{ space.name }}</a> /
+  <a href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=page.slug) }}">{{ page.title }}</a> / Verlauf
+</div>
+<div class="page-head"><h1>Verlauf</h1></div>
+
+<table class="data">
+  <thead>
+    <tr><th>Zeitpunkt</th><th>Autor</th><th>Notiz</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for r in page.revisions %}
+    <tr>
+      <td style="white-space:nowrap">{{ r.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+      <td>{{ r.author.name if r.author else '—' }}</td>
+      <td class="muted">{{ r.comment or '' }}</td>
+      <td><a class="btn-small" href="{{ url_for('wiki.revision', space_slug=space.slug, page_slug=page.slug, rev_id=r.id) }}">Ansehen</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="muted">Keine Versionen vorhanden.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

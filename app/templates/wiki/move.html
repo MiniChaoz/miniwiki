@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Verschieben: {{ page.title }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('wiki.space', space_slug=space.slug) }}">{{ space.name }}</a> /
+  <a href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=page.slug) }}">{{ page.title }}</a> / Verschieben
+</div>
+<div class="page-head"><h1>Seite verschieben</h1></div>
+
+<div class="card" style="max-width:560px">
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div class="form-row">
+    {{ form.target_space.label }}
+    {{ form.target_space(onchange="location.href='?target='+this.value") }}
+    <div class="small muted">Auch ein anderer Bereich möglich – nur Bereiche, in denen du schreiben darfst.</div>
+  </div>
+  <div class="form-row">
+    {{ form.parent_id.label }}
+    {{ form.parent_id() }}
+    <div class="small muted">Wohin im Ziel-Bereich? „Oberste Ebene" = ganz oben, sonst unter eine Seite.</div>
+  </div>
+  <div class="flash flash-info small">
+    Unterseiten werden <strong>mitverschoben</strong>. Deine Wahl gilt ab dem nächsten Speichern.
+  </div>
+  <div class="actions">
+    {{ form.submit(class="btn") }}
+    <a class="btn-ghost" href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=page.slug) }}">Abbrechen</a>
+  </div>
+</form>
+</div>
+{% endblock %}

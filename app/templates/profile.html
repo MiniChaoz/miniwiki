@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Profil – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Profil</h1></div>
+
+<div class="card">
+  <p><strong>Benutzername:</strong> {{ current_user.username }}</p>
+  <p><strong>Anzeigename:</strong> {{ current_user.name }}</p>
+  <p><strong>Globale Rolle:</strong> <span class="badge role-{{ current_user.role }}">{{ current_user.role_label }}</span></p>
+</div>
+
+<div class="card">
+  <h3>Passwort ändern</h3>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+      {{ form.current_password.label }} {{ form.current_password(autocomplete="current-password") }}
+      {% for e in form.current_password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
+      {{ form.password.label }} {{ form.password(autocomplete="new-password") }}
+      {% for e in form.password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
+      {{ form.password2.label }} {{ form.password2(autocomplete="new-password") }}
+      {% for e in form.password2.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+    </div>
+    {{ form.submit(class="btn") }}
+  </form>
+</div>
+{% endblock %}

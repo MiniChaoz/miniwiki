@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Nutzer bearbeiten' if user else 'Neuer Nutzer' }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="page-head"><h1>{{ 'Nutzer bearbeiten' if user else 'Neuer Nutzer' }}</h1></div>
+
+<div class="card" style="max-width:520px">
+<form method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="form-row">
+    {{ form.username.label }} {{ form.username() }}
+    {% for e in form.username.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="form-row">
+    {{ form.display_name.label }} {{ form.display_name() }}
+  </div>
+  <div class="form-row">
+    {{ form.email.label }} {{ form.email() }}
+    {% for e in form.email.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="form-row">
+    {{ form.role.label }} {{ form.role() }}
+    <div class="small muted">Leser: nur lesen · Redakteur: lesen/schreiben · Admin: alles + Verwaltung</div>
+  </div>
+  <div class="form-row checkbox-row">
+    {{ form.is_active() }} {{ form.is_active.label }}
+  </div>
+  <hr class="sep">
+  <div class="form-row">
+    {{ form.password.label }} {{ form.password(autocomplete="new-password") }}
+    {% if user %}<div class="small muted">Leer lassen, um das Passwort nicht zu ändern.</div>{% endif %}
+    {% for e in form.password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="form-row">
+    {{ form.password2.label }} {{ form.password2(autocomplete="new-password") }}
+    {% for e in form.password2.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="actions">
+    {{ form.submit(class="btn") }}
+    <a class="btn-ghost" href="{{ url_for('admin.users') }}">Abbrechen</a>
+  </div>
+</form>
+</div>
+{% endblock %}

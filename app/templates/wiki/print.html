@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>{{ page.title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body { background:#fff; color:#111; max-width:800px; margin:0 auto; padding:30px; }
+    .toolbar { margin-bottom:20px; }
+    @media print { .toolbar { display:none; } body { padding:0; } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button onclick="window.print()">Drucken / als PDF speichern</button>
+  </div>
+  <h1>{{ page.title }}</h1>
+  <p style="color:#666;font-size:13px">
+    {{ space.name }} · Stand {{ page.updated_at.strftime('%d.%m.%Y %H:%M') }}
+    {% if page.tags %}<br>{% for t in page.tags %}#{{ t.name }} {% endfor %}{% endif %}
+  </p>
+  <hr>
+  <div class="prose">{{ body_html|safe }}</div>
+</body>
+</html>

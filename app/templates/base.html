@@ -1,0 +1,130 @@
+{% macro render_pages(nodes, active_page, page_drag) %}
+  <ul class="tree">
+  {% for p in nodes %}
+    <li class="tnode {{ 'active-branch' if p.slug == active_page else '' }}"
+        data-key="page:{{ p.slug }}" data-kind="page" data-id="{{ p.id }}" data-space="{{ p.space_id }}">
+      <div class="trow"{% if page_drag %} draggable="true"{% endif %}>
+        {% if p.children %}<span class="ttoggle">▾</span>{% else %}<span class="tspacer"></span>{% endif %}
+        <a href="{{ url_for('wiki.page', space_slug=p.space.slug, page_slug=p.slug) }}" draggable="false"
+           class="{{ 'active' if p.slug == active_page else '' }}">{{ p.title }}</a>
+      </div>
+      {% if p.children %}<div class="tkids">{{ render_pages(p.children|sort(attribute='title')|sort(attribute='position'), active_page, page_drag) }}</div>{% endif %}
+    </li>
+  {% endfor %}
+  </ul>
+{% endmacro %}
+{% macro render_spaces(nodes, active_slug, active_page, page_tree, space_drag, page_drag) %}
+  <ul class="tree">
+  {% for s in nodes %}
+    {% set has_kids = s.nav_children or (s.slug == active_slug and page_tree) %}
+    <li class="tnode {{ 'active-branch' if s.slug == active_slug else '' }}"
+        data-key="space:{{ s.slug }}" data-kind="space" data-id="{{ s.id }}">
+      <div class="trow"{% if space_drag %} draggable="true"{% endif %}>
+        {% if has_kids %}<span class="ttoggle">▾</span>{% else %}<span class="tspacer"></span>{% endif %}
+        <a href="{{ url_for('wiki.space', space_slug=s.slug) }}" draggable="false"
+           class="{{ 'active' if s.slug == active_slug else '' }}">{{ s.name }}</a>
+      </div>
+      {% if has_kids %}
+      <div class="tkids">
+        {% if s.slug == active_slug and page_tree %}{{ render_pages(page_tree, active_page, page_drag) }}{% endif %}
+        {% if s.nav_children %}{{ render_spaces(s.nav_children, active_slug, active_page, page_tree, space_drag, page_drag) }}{% endif %}
+      </div>
+      {% endif %}
+    </li>
+  {% endfor %}
+  </ul>
+{% endmacro %}
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ WIKI_NAME }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    /* Gespeichertes Design früh anwenden – kein Aufblitzen beim Laden */
+    (function () {
+      try {
+        var t = localStorage.getItem('wiki.theme');
+        if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+{% if INSTANCE_LABEL %}
+  <div class="instance-banner">{{ INSTANCE_LABEL }}</div>
+{% endif %}
+
+{% if current_user.is_authenticated %}
+<header class="topbar">
+  <button class="icon-btn" id="sidebar-toggle" title="Seitenleiste ein-/ausblenden" aria-label="Seitenleiste">☰</button>
+  <a class="brand" href="{{ url_for('wiki.index') }}">📚 {{ WIKI_NAME }}</a>
+  <button class="palette-trigger" onclick="window.__openPalette && window.__openPalette()" title="Schnellsuche (Strg+K)">
+    🔍 <span class="palette-trigger-text">Seite suchen…</span> <span class="kbd">Strg K</span>
+  </button>
+  <form class="search" action="{{ url_for('wiki.search') }}" method="get" role="search">
+    <input type="search" name="q" placeholder="Volltextsuche…" value="{{ request.args.get('q','') }}" aria-label="Suchen">
+  </form>
+  <nav class="usernav">
+    <button class="icon-btn" id="theme-toggle" title="Design umschalten" aria-label="Design umschalten">🌓</button>
+    {% if current_user.is_admin %}
+      <a href="{{ url_for('admin.spaces') }}">Verwaltung</a>
+    {% endif %}
+    <a href="{{ url_for('profile.profile') }}">{{ current_user.name }}</a>
+    <a class="btn-ghost" href="{{ url_for('auth.logout') }}">Abmelden</a>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <a class="side-link {{ 'active' if request.endpoint == 'wiki.index' else '' }}" href="{{ url_for('wiki.index') }}">🏠 Übersicht</a>
+    <a class="side-link {{ 'active' if request.endpoint == 'wiki.changes' else '' }}" href="{{ url_for('wiki.changes') }}">🕑 Letzte Änderungen</a>
+    <a class="side-link {{ 'active' if request.endpoint in ('wiki.tags','wiki.tag') else '' }}" href="{{ url_for('wiki.tags') }}">🏷️ Schlagworte</a>
+    <div class="sidebar-head" style="margin-top:14px">Bereiche</div>
+    {% if nav_space_tree %}
+      {{ render_spaces(nav_space_tree, nav_active_slug, nav_active_page, nav_tree, nav_space_drag, nav_page_drag) }}
+    {% else %}
+      <ul class="space-list"><li class="muted">Keine Bereiche freigegeben.</li></ul>
+    {% endif %}
+    {% if current_user.is_admin %}
+      <a class="btn-small" href="{{ url_for('admin.new_space') }}">+ Neuer Bereich</a>
+    {% endif %}
+  </aside>
+
+  <main class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<div id="palette" class="palette-overlay" hidden>
+  <div class="palette" role="dialog" aria-label="Schnellsuche">
+    <input id="palette-input" type="text" autocomplete="off" spellcheck="false"
+           placeholder="Seite suchen – tippen und mit Enter öffnen…">
+    <ul id="palette-results"></ul>
+    <div class="palette-hint">↑ ↓ wählen · Enter öffnen · Esc schließen</div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/nav.js') }}"
+        data-quickfind="{{ url_for('wiki.quickfind') }}"
+        data-move="{{ url_for('wiki.api_move') }}"
+        data-csrf="{{ csrf_token() }}"></script>
+{% else %}
+  <main class="content-full">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content_full %}{% endblock %}
+  </main>
+{% endif %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

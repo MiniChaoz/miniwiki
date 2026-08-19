@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}#{{ tag.name }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="breadcrumb"><a href="{{ url_for('wiki.tags') }}">Schlagworte</a> / #{{ tag.name }}</div>
+<div class="page-head"><h1>🏷️ #{{ tag.name }}</h1></div>
+
+{% if pages %}
+<table class="data">
+  <tbody>
+    {% for p in pages %}
+    <tr>
+      <td>
+        <a href="{{ url_for('wiki.page', space_slug=p.space.slug, page_slug=p.slug) }}">{{ p.title }}</a>
+        <div class="small muted">{{ excerpt(p.content, 120) }}</div>
+      </td>
+      <td class="small muted" style="white-space:nowrap">{{ p.space.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card muted">Keine (für dich sichtbaren) Seiten mit diesem Schlagwort.</div>
+{% endif %}
+{% endblock %}

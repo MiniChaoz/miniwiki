@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Kein Zugriff – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>🔒 Kein Zugriff</h1></div>
+<div class="card muted">Für diesen Bereich oder diese Aktion fehlt dir die Berechtigung.
+<br><a href="{{ url_for('wiki.index') }}">Zurück zur Übersicht</a></div>
+{% endblock %}
+{% block content_full %}
+<div class="card"><h2>🔒 Kein Zugriff</h2><p class="muted">Bitte <a href="{{ url_for('auth.login') }}">anmelden</a>.</p></div>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Neue Seite' if not page else 'Bearbeiten' }} – {{ WIKI_NAME }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('wiki.space', space_slug=space.slug) }}">{{ space.name }}</a> /
+  {{ page.title if page else 'Neue Seite' }}
+</div>
+<div class="page-head">
+  <h1>{{ 'Seite bearbeiten' if page else 'Neue Seite' }}</h1>
+</div>
+
+{% if templates %}
+<div class="card" style="padding:12px 16px">
+  <label for="tplpick" style="margin-bottom:6px">Aus Vorlage starten</label>
+  <select id="tplpick" onchange="if(this.value) location.href='?template='+this.value;">
+    <option value="">— leere Seite —</option>
+    {% for t in templates %}
+      <option value="{{ t.id }}" {{ 'selected' if request.args.get('template')|string == t.id|string else '' }}>{{ t.name }}{% if t.description %} – {{ t.description }}{% endif %}</option>
+    {% endfor %}
+  </select>
+  <div class="small muted" style="margin-top:6px">Füllt den Inhalt mit einer vorbereiteten Struktur (überschreibt Getipptes).</div>
+</div>
+{% endif %}
+
+<form method="post" id="page-form">
+  {{ form.hidden_tag() }}
+  <div class="form-row">
+    {{ form.title.label }}
+    {{ form.title(autofocus=true, placeholder="Titel der Seite") }}
+    {% for e in form.title.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+
+  <div class="form-row">
+    {{ form.parent_id.label }}
+    {{ form.parent_id() }}
+    <div class="small muted">Bestimmt die Einordnung im Seitenbaum links.</div>
+  </div>
+
+  <div class="form-row">
+    {{ form.tags.label }}
+    {{ form.tags(placeholder="z. B. VPN, Drucker, Kunde-XY") }}
+    <div class="small muted">Komma-getrennt. Schlagworte verbinden Seiten über Bereiche hinweg.</div>
+  </div>
+
+  <div class="form-row">
+    <label>Inhalt <span class="small muted">– Umschalter „Markdown / WYSIWYG" unten im Editor · Bilder per Drag &amp; Drop oder Einfügen</span></label>
+    <div id="editor"></div>
+    {{ form.content(id="content-field") }}
+  </div>
+
+  <div class="form-row">
+    {{ form.comment.label }}
+    {{ form.comment(placeholder="z. B. Tippfehler korrigiert") }}
+  </div>
+
+  <div class="actions">
+    {{ form.submit(class="btn") }}
+    {% if page %}
+      <a class="btn-ghost" href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=page.slug) }}">Abbrechen</a>
+    {% else %}
+      <a class="btn-ghost" href="{{ url_for('wiki.space', space_slug=space.slug) }}">Abbrechen</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css">
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+(function () {
+  var textarea = document.getElementById('content-field');
+  var holder = document.getElementById('editor');
+  var form = document.getElementById('page-form');
+
+  // Fallback: kein Editor geladen -> einfaches Markdown-Textfeld nutzen.
+  if (typeof toastui === 'undefined' || !toastui.Editor) {
+    holder.style.display = 'none';
+    textarea.style.display = 'block';
+    return;
+  }
+
+  textarea.style.display = 'none';
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  var CSRF = "{{ csrf_token() }}";
+  var UPLOAD_URL = "{{ url_for('uploads.upload_image') }}";
+
+  var editor = new toastui.Editor({
+    el: holder,
+    height: '520px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    usageStatistics: false,
+    theme: dark ? 'dark' : 'default',
+    initialValue: textarea.value || '',
+    hooks: {
+      addImageBlobHook: function (blob, callback) {
+        var fd = new FormData();
+        fd.append('image', blob);
+        fetch(UPLOAD_URL, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': CSRF },
+          body: fd,
+          credentials: 'same-origin'
+        })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (res.ok && res.d.url) {
+            callback(res.d.url, (blob && blob.name) ? blob.name : 'Bild');
+          } else {
+            alert('Upload fehlgeschlagen: ' + (res.d.error || 'unbekannter Fehler'));
+          }
+        })
+        .catch(function () { alert('Upload fehlgeschlagen (Netzwerkfehler).'); });
+        return false;
+      }
+    }
+  });
+
+  form.addEventListener('submit', function () {
+    textarea.value = editor.getMarkdown();
+  });
+})();
+</script>
+{% endblock %}

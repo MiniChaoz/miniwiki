@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Zugriffe: {{ space.name }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="breadcrumb"><a href="{{ url_for('admin.spaces') }}">Bereiche</a> / {{ space.name }} / Zugriffe</div>
+<div class="page-head"><h1>Zugriffe: {{ space.name }}</h1></div>
+
+<div class="flash flash-info">
+  Standardzugriff für alle eingeloggten Nutzer: <strong>{{ space.default_access_label }}</strong>.
+  Unten legst du <strong>Ausnahmen</strong> für einzelne Nutzer fest, die den Standard übersteuern.
+</div>
+
+<div class="card">
+  <h3>Ausnahmen (Nutzer mit eigenem Zugriff)</h3>
+  <table class="data">
+    <thead><tr><th>Nutzer</th><th>Zugriff</th><th></th></tr></thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td>{{ m.user.name }} <span class="small muted">({{ m.user.username }})</span>
+          {% if m.user.is_admin %}<span class="badge role-admin">Admin – sieht ohnehin alles</span>{% endif %}
+        </td>
+        <td><span class="badge access-{{ m.access }}">{{ m.access_label }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('admin.remove_member', space_id=space.id, membership_id=m.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn-small" style="color:var(--danger-fg)">Entfernen</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="muted">Keine Ausnahmen – es gilt überall der Standardzugriff.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if has_candidates %}
+<div class="card" style="max-width:520px">
+  <h3>Nutzer hinzufügen / Zugriff setzen</h3>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-row">{{ form.user_id.label }} {{ form.user_id() }}</div>
+    <div class="form-row">{{ form.access.label }} {{ form.access() }}</div>
+    {{ form.submit(class="btn") }}
+  </form>
+</div>
+{% else %}
+<div class="card muted">Für alle vorhandenen Nutzer ist bereits ein Zugriff gesetzt.</div>
+{% endif %}
+{% endblock %}

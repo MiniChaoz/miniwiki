@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}{{ page.title }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('wiki.space', space_slug=space.slug) }}">{{ space.name }}</a>
+  {% for a in ancestors %} / <a href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=a.slug) }}">{{ a.title }}</a>{% endfor %}
+  / {{ page.title }}
+</div>
+<div class="page-head">
+  <h1>{{ page.title }}</h1>
+  <div class="actions">
+    <form method="post" action="{{ url_for('wiki.toggle_favorite', space_slug=space.slug, page_slug=page.slug) }}" style="display:inline;margin:0">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn-small{{ ' is-fav' if is_favorite else '' }}" title="{{ 'Aus Favoriten entfernen' if is_favorite else 'Zu Favoriten hinzufügen' }}">{{ '★ Favorit' if is_favorite else '☆ Merken' }}</button>
+    </form>
+    <a class="btn-small" href="{{ url_for('wiki.pdf_page', space_slug=space.slug, page_slug=page.slug) }}">PDF</a>
+    <a class="btn-small" href="{{ url_for('wiki.print_page', space_slug=space.slug, page_slug=page.slug) }}" target="_blank">Drucken</a>
+    <a class="btn-small" href="{{ url_for('wiki.history', space_slug=space.slug, page_slug=page.slug) }}">Verlauf</a>
+    {% if can_write %}
+      <form method="post" action="{{ url_for('wiki.reorder_page', space_slug=space.slug, page_slug=page.slug, direction='up') }}" style="display:inline;margin:0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn-small" title="In der Reihenfolge nach oben">↑</button>
+      </form>
+      <form method="post" action="{{ url_for('wiki.reorder_page', space_slug=space.slug, page_slug=page.slug, direction='down') }}" style="display:inline;margin:0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn-small" title="In der Reihenfolge nach unten">↓</button>
+      </form>
+      <a class="btn-small" href="{{ url_for('wiki.move_page', space_slug=space.slug, page_slug=page.slug) }}">Verschieben</a>
+      <a class="btn-small" href="{{ url_for('wiki.new_page', space_slug=space.slug, parent=page.id) }}">+ Unterseite</a>
+      <a class="btn" href="{{ url_for('wiki.edit_page', space_slug=space.slug, page_slug=page.slug) }}">Bearbeiten</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if page.tags %}
+<div class="tag-row">
+  {% for t in page.tags|sort(attribute='name') %}
+    <a class="tag-chip" href="{{ url_for('wiki.tag', slug=t.slug) }}">#{{ t.name }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+<div class="meta">
+  Erstellt am {{ page.created_at.strftime('%d.%m.%Y %H:%M') }}{% if page.author %} von {{ page.author.name }}{% endif %}
+  &nbsp;·&nbsp;
+  Zuletzt geändert am {{ page.updated_at.strftime('%d.%m.%Y %H:%M') }}{% if page.editor %} von {{ page.editor.name }}{% endif %}
+  &nbsp;·&nbsp;
+  <a href="{{ url_for('wiki.history', space_slug=space.slug, page_slug=page.slug) }}">Verlauf ({{ page.revisions|length }})</a>
+</div>
+
+<div class="page-body">
+  <div class="prose" id="page-content">
+    {% if body_html %}{{ body_html|safe }}{% else %}<p class="muted"><em>Diese Seite ist noch leer.</em></p>{% endif %}
+  </div>
+  <aside id="page-toc" class="toc" hidden>
+    <div class="toc-head">Auf dieser Seite</div>
+    <ul></ul>
+  </aside>
+</div>
+
+{% if children %}
+<hr class="sep">
+<h3>Unterseiten</h3>
+<ul class="child-list">
+  {% for c in children %}
+    <li><a href="{{ url_for('wiki.page', space_slug=space.slug, page_slug=c.slug) }}">{{ c.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<hr class="sep">
+<h3>📎 Anhänge</h3>
+{% if page.attachments %}
+<ul class="child-list">
+  {% for a in page.attachments %}
+  <li style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+    <span>
+      <a href="{{ url_for('attachments.download', att_id=a.id) }}">{{ a.original_name }}</a>
+      <span class="small muted">{{ a.size_human }}{% if a.uploader %} · {{ a.uploader.name }}{% endif %} · {{ a.created_at.strftime('%d.%m.%Y') }}</span>
+    </span>
+    {% if can_write %}
+    <form method="post" action="{{ url_for('attachments.delete', att_id=a.id) }}"
+          onsubmit="return confirm('Anhang löschen?');" style="margin:0">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn-small" style="color:var(--danger-fg)">löschen</button>
+    </form>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted small">Keine Anhänge.</p>
+{% endif %}
+{% if can_write %}
+<form method="post" action="{{ url_for('attachments.upload', space_slug=space.slug, page_slug=page.slug) }}"
+      enctype="multipart/form-data" class="actions" style="margin-top:6px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="file" name="file" required style="max-width:320px">
+  <button class="btn-small" type="submit">Hochladen</button>
+</form>
+{% endif %}
+
+{% if can_write %}
+<hr class="sep">
+<form method="post" action="{{ url_for('wiki.delete_page', space_slug=space.slug, page_slug=page.slug) }}"
+      onsubmit="return confirm('Diese Seite wirklich löschen?');" style="display:inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn-small" style="color:var(--danger-fg)">Seite löschen</button>
+</form>
+{% endif %}
+{% endblock %}

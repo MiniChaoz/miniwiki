@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Nutzer – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="page-head">
+  <h1>Nutzer</h1>
+  <a class="btn" href="{{ url_for('admin.new_user') }}">+ Neuer Nutzer</a>
+</div>
+
+<table class="data">
+  <thead>
+    <tr><th>Benutzer</th><th>Rolle</th><th>Status</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>
+        <strong>{{ u.name }}</strong> <span class="small muted">({{ u.username }})</span>
+        {% if u.email %}<div class="small muted">{{ u.email }}</div>{% endif %}
+      </td>
+      <td><span class="badge role-{{ u.role }}">{{ u.role_label }}</span></td>
+      <td>{% if u.is_active %}<span class="small">aktiv</span>{% else %}<span class="small muted">deaktiviert</span>{% endif %}</td>
+      <td class="actions">
+        <a class="btn-small" href="{{ url_for('admin.edit_user', user_id=u.id) }}">Bearbeiten</a>
+        {% if u.id != current_user.id %}
+        <form method="post" action="{{ url_for('admin.delete_user', user_id=u.id) }}"
+              onsubmit="return confirm('Nutzer wirklich löschen?');" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn-small" style="color:var(--danger-fg)">Löschen</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

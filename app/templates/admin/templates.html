@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Vorlagen – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="page-head">
+  <h1>Seiten-Vorlagen</h1>
+  <a class="btn" href="{{ url_for('admin.new_template') }}">+ Neue Vorlage</a>
+</div>
+
+<table class="data">
+  <thead><tr><th>Name</th><th>Beschreibung</th><th></th></tr></thead>
+  <tbody>
+    {% for t in templates %}
+    <tr>
+      <td><strong>{{ t.name }}</strong></td>
+      <td class="small muted">{{ t.description or '' }}</td>
+      <td class="actions">
+        <a class="btn-small" href="{{ url_for('admin.edit_template', tpl_id=t.id) }}">Bearbeiten</a>
+        <form method="post" action="{{ url_for('admin.delete_template', tpl_id=t.id) }}"
+              onsubmit="return confirm('Vorlage löschen?');" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn-small" style="color:var(--danger-fg)">Löschen</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="muted">Noch keine Vorlagen. Tipp: Standardvorlagen per <code>flask seed-templates</code> anlegen.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

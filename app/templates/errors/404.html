@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Nicht gefunden – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>🔍 Nicht gefunden</h1></div>
+<div class="card muted">Diese Seite oder dieser Bereich existiert nicht (mehr).
+<br><a href="{{ url_for('wiki.index') }}">Zurück zur Übersicht</a></div>
+{% endblock %}
+{% block content_full %}
+<div class="card"><h2>🔍 Nicht gefunden</h2><p class="muted"><a href="{{ url_for('auth.login') }}">Zur Anmeldung</a></p></div>
+{% endblock %}

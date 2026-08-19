@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Schlagworte – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>🏷️ Schlagworte</h1></div>
+{% if entries %}
+<div class="tag-row">
+  {% for t, count in entries %}
+    <a class="tag-chip" href="{{ url_for('wiki.tag', slug=t.slug) }}">#{{ t.name }} <span class="muted">({{ count }})</span></a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card muted">Noch keine Schlagworte vergeben. Du kannst sie beim Bearbeiten einer Seite hinzufügen.</div>
+{% endif %}
+{% endblock %}

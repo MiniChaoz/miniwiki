@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Vorlage bearbeiten' if tpl else 'Neue Vorlage' }} – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<div class="page-head"><h1>{{ 'Vorlage bearbeiten' if tpl else 'Neue Vorlage' }}</h1></div>
+
+<div class="card" style="max-width:720px">
+<form method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="form-row">
+    {{ form.name.label }} {{ form.name() }}
+    {% for e in form.name.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+  </div>
+  <div class="form-row">
+    {{ form.description.label }} {{ form.description() }}
+  </div>
+  <div class="form-row">
+    {{ form.title_hint.label }} {{ form.title_hint() }}
+    <div class="small muted">Wird als Titel-Vorschlag übernommen, wenn eine neue Seite aus dieser Vorlage entsteht.</div>
+  </div>
+  <div class="form-row">
+    {{ form.content.label }} {{ form.content(style="min-height:320px;font-family:monospace") }}
+    <div class="small muted">Markdown. Diese Struktur wird beim Anlegen einer Seite eingefügt.</div>
+  </div>
+  <div class="actions">
+    {{ form.submit(class="btn") }}
+    <a class="btn-ghost" href="{{ url_for('admin.templates') }}">Abbrechen</a>
+  </div>
+</form>
+</div>
+{% endblock %}

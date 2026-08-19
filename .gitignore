@@ -1,0 +1,23 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Konfiguration & Geheimnisse (NIEMALS committen)
+.env
+
+# Laufzeit-/Nutzerdaten (nicht Teil des Codes)
+instance/
+*.db
+*.sqlite
+*.log
+
+# Datenbank-Migrationen (dieses Projekt nutzt 'flask ensure-schema')
+migrations/
+
+# Betriebssystem / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

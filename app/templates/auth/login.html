@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Anmelden – {{ WIKI_NAME }}{% endblock %}
+{% block content_full %}
+<div class="login-card">
+  <h1 class="login-title">📚 {{ WIKI_NAME }}</h1>
+  <p class="login-sub">Bitte melde dich an.</p>
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+      {{ form.username.label }}
+      {{ form.username(autofocus=true, autocomplete="username") }}
+      {% for e in form.username.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
+      {{ form.password.label }}
+      {{ form.password(autocomplete="current-password") }}
+      {% for e in form.password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row checkbox-row">
+      {{ form.remember() }} {{ form.remember.label }}
+    </div>
+    {{ form.submit(class="btn", style="width:100%") }}
+  </form>
+</div>
+{% endblock %}

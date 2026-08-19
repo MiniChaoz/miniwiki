@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Suche – {{ WIKI_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Suche</h1></div>
+
+<form action="{{ url_for('wiki.search') }}" method="get" style="margin-bottom:18px">
+  <input type="search" name="q" value="{{ q }}" placeholder="Suchbegriff…" autofocus>
+</form>
+
+{% if q %}
+  <p class="muted small">{{ results|length }} Treffer für „{{ q }}"</p>
+  {% if results %}
+    <table class="data">
+      <tbody>
+        {% for p in results %}
+        <tr>
+          <td>
+            <a href="{{ url_for('wiki.page', space_slug=p.space.slug, page_slug=p.slug) }}">{{ p.title }}</a>
+            <div class="small muted">{{ highlight(p.content, q) }}</div>
+            {% if p.tags %}
+              <div style="margin-top:4px">
+                {% for t in p.tags|sort(attribute='name') %}<a class="tag-chip" href="{{ url_for('wiki.tag', slug=t.slug) }}">#{{ t.name }}</a>{% endfor %}
+              </div>
+            {% endif %}
+          </td>
+          <td class="small muted" style="white-space:nowrap">{{ p.space.name }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="card muted">Keine passenden Seiten gefunden.</div>
+  {% endif %}
+{% endif %}
+{% endblock %}
