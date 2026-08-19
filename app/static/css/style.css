@@ -198,6 +198,9 @@ table.data tr:last-child td { border-bottom: none; }
 
 hr.sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 
+.site-foot { text-align: center; color: var(--muted); font-size: 12px; padding: 18px 12px 26px; border-top: 1px solid var(--border); margin-top: 8px; }
+.site-foot a { color: var(--muted); }
+
 .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .tag-chip { display: inline-block; font-size: 13px; padding: 3px 11px; border-radius: 999px;
   background: var(--info-bg); color: var(--info-fg); border: 1px solid transparent; }

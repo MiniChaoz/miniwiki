@@ -23,6 +23,9 @@ class Config:
     # Name/Label der Instanz (erscheint im Kopf des Wikis)
     WIKI_NAME = os.environ.get('WIKI_NAME', 'MiniWiki')
 
+    # AGPL: Link zum Quellcode (im Seitenfuss angezeigt, falls gesetzt)
+    SOURCE_URL = os.environ.get('SOURCE_URL', '')
+
     # Sichtbares Instanz-Label (z.B. "TEST"). Leer = Produktion (kein Banner).
     INSTANCE_LABEL = os.environ.get('INSTANCE_LABEL', '')
 

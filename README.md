@@ -226,7 +226,17 @@ Der Dienst (bzw. `python run.py`) danach neu starten.
 
 ## Lizenz
 
-**Proprietär – Alle Rechte vorbehalten** (siehe [LICENSE](LICENSE)). Dieser Code ist
-**nicht** Open Source: Vervielfältigung, Weitergabe, kommerzielle Nutzung oder Verkauf
-sind ohne schriftliche Genehmigung des Rechteinhabers nicht gestattet. Bitte in der
-`LICENSE` deinen Namen als Rechteinhaber eintragen.
+**GNU AGPL v3** – siehe [LICENSE](LICENSE).
+
+Das bedeutet (wie bei DokuWiki, angepasst für Web-Apps): Der Code ist Open Source,
+**aber Copyleft** – wer ihn weitergibt, verändert **oder als Netzwerk-Dienst betreibt**,
+muss den (ggf. geänderten) Quellcode **offen unter AGPL** bereitstellen und die
+Urheber nennen. „Nehmen, zumachen und als eigenes proprietäres Produkt verkaufen"
+ist damit **nicht** erlaubt.
+
+Copyright (C) 2026 &lt;Dein Name&gt; – bitte in [LICENSE](LICENSE)-Hinweisen und den
+Datei-Kopfzeilen deinen Namen eintragen.
+
+> Hinweis zur AGPL: Da das Wiki als Web-Dienst läuft, sollte im Betrieb ein gut
+> sichtbarer Link auf den Quellcode vorhanden sein (z. B. im Seitenfuß). Setze dazu
+> die Umgebungsvariable `SOURCE_URL` auf deine Repository-Adresse.

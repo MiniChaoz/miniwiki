@@ -1,3 +1,6 @@
+# MiniWiki – selbst gehostetes Wiki
+# Copyright (C) 2026 <Dein Name>
+# Lizenz: GNU Affero General Public License v3 – siehe LICENSE.
 import os
 import click
 from flask import Flask
