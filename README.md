@@ -226,4 +226,7 @@ Der Dienst (bzw. `python run.py`) danach neu starten.
 
 ## Lizenz
 
-MIT – siehe [LICENSE](LICENSE). Trag dort gern deinen Namen als Copyright-Inhaber ein.
+**Proprietär – Alle Rechte vorbehalten** (siehe [LICENSE](LICENSE)). Dieser Code ist
+**nicht** Open Source: Vervielfältigung, Weitergabe, kommerzielle Nutzung oder Verkauf
+sind ohne schriftliche Genehmigung des Rechteinhabers nicht gestattet. Bitte in der
+`LICENSE` deinen Namen als Rechteinhaber eintragen.
