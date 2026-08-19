@@ -1,5 +1,5 @@
 # MiniWiki – selbst gehostetes Wiki
-# Copyright (C) 2026 <Dein Name>
+# Copyright (C) 2026 MiniChaoz
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free

@@ -1,5 +1,5 @@
 # MiniWiki – selbst gehostetes Wiki
-# Copyright (C) 2026 <Dein Name>
+# Copyright (C) 2026 MiniChaoz
 # Lizenz: GNU Affero General Public License v3 – siehe LICENSE.
 import os
 import click

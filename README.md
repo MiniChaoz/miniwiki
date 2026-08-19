@@ -234,8 +234,7 @@ muss den (ggf. geänderten) Quellcode **offen unter AGPL** bereitstellen und die
 Urheber nennen. „Nehmen, zumachen und als eigenes proprietäres Produkt verkaufen"
 ist damit **nicht** erlaubt.
 
-Copyright (C) 2026 &lt;Dein Name&gt; – bitte in [LICENSE](LICENSE)-Hinweisen und den
-Datei-Kopfzeilen deinen Namen eintragen.
+Copyright (C) 2026 MiniChaoz
 
 > Hinweis zur AGPL: Da das Wiki als Web-Dienst läuft, sollte im Betrieb ein gut
 > sichtbarer Link auf den Quellcode vorhanden sein (z. B. im Seitenfuß). Setze dazu
