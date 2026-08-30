@@ -8,6 +8,16 @@
   </div>
   <div class="actions">
     {% if can_admin %}
+      <form method="post" action="{{ url_for('admin.reorder_space', space_id=space.id, direction='up') }}" style="display:inline;margin:0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn-small" title="Bereich nach oben">↑</button>
+      </form>
+      <form method="post" action="{{ url_for('admin.reorder_space', space_id=space.id, direction='down') }}" style="display:inline;margin:0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn-small" title="Bereich nach unten">↓</button>
+      </form>
+      <a class="btn-small" href="{{ url_for('admin.edit_space', space_id=space.id) }}">Bereich bearbeiten</a>
+      <a class="btn-small" href="{{ url_for('admin.space_members', space_id=space.id) }}">Zugriffe</a>
       <a class="btn-ghost" href="{{ url_for('admin.new_space', parent=space.id) }}">+ Unterbereich</a>
     {% endif %}
     {% if can_write %}
@@ -15,6 +25,16 @@
     {% endif %}
   </div>
 </div>
+
+{% if can_admin %}
+<div style="margin:-6px 0 10px">
+  <form method="post" action="{{ url_for('admin.delete_space', space_id=space.id) }}"
+        onsubmit="return confirm('Bereich „{{ space.name }}“ samt allen Seiten wirklich löschen? Unterbereiche rücken eine Ebene nach oben.');" style="display:inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn-small" style="color:var(--danger-fg)">Bereich löschen</button>
+  </form>
+</div>
+{% endif %}
 
 {% if child_spaces %}
 <h3 style="margin-top:18px">Unterbereiche</h3>
