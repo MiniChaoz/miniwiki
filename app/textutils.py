@@ -32,20 +32,22 @@ _ALLOWED_PROTOCOLS = ['http', 'https', 'mailto', 'data']
 # Hinweis-/Callout-Boxen: geschrieben als Zitat mit Marker in der ersten Zeile,
 # z.B.  > [!WARNUNG]
 #       > Text ...
+# key -> (css-klasse, emoji, standard-titel)
 _CALLOUTS = {
-    'HINWEIS': ('note', 'ℹ️ Hinweis'), 'NOTE': ('note', 'ℹ️ Hinweis'), 'INFO': ('note', 'ℹ️ Hinweis'),
-    'TIPP': ('tip', '💡 Tipp'), 'TIP': ('tip', '💡 Tipp'),
-    'WARNUNG': ('warning', '⚠️ Warnung'), 'WARNING': ('warning', '⚠️ Warnung'),
-    'ACHTUNG': ('danger', '⛔ Achtung'), 'CAUTION': ('danger', '⛔ Achtung'),
-    'DANGER': ('danger', '⛔ Achtung'), 'IMPORTANT': ('danger', '⛔ Wichtig'), 'WICHTIG': ('danger', '⛔ Wichtig'),
-    'TROUBLESHOOTING': ('trouble', '🔧 Troubleshooting'), 'PROBLEM': ('trouble', '🔧 Troubleshooting'),
-    'FEHLER': ('trouble', '🔧 Troubleshooting'),
+    'HINWEIS': ('note', 'ℹ️', 'Hinweis'), 'NOTE': ('note', 'ℹ️', 'Hinweis'), 'INFO': ('note', 'ℹ️', 'Info'),
+    'TIPP': ('tip', '💡', 'Tipp'), 'TIP': ('tip', '💡', 'Tipp'),
+    'WARNUNG': ('warning', '⚠️', 'Warnung'), 'WARNING': ('warning', '⚠️', 'Warnung'),
+    'ACHTUNG': ('danger', '⛔', 'Achtung'), 'CAUTION': ('danger', '⛔', 'Achtung'),
+    'DANGER': ('danger', '⛔', 'Achtung'), 'IMPORTANT': ('danger', '⛔', 'Wichtig'), 'WICHTIG': ('danger', '⛔', 'Wichtig'),
+    'TROUBLESHOOTING': ('trouble', '🔧', 'Troubleshooting'), 'PROBLEM': ('trouble', '🔧', 'Troubleshooting'),
+    'FEHLER': ('trouble', '🔧', 'Troubleshooting'),
 }
 
 
 def _preprocess_callouts(text):
     """Wandelt Zitat-Marker (> [!WARNUNG]) in Admonition-Bloecke um, die die
-    Markdown-Engine sauber als getrennte Hinweis-Boxen rendert."""
+    Markdown-Engine sauber als getrennte Hinweis-Boxen rendert.
+    Optionaler eigener Titel: > [!HINWEIS] Eigener Titel"""
     marker_re = re.compile(r'^\s*>\s*\[!(\w+)\]\s*(.*)$')
     quote_re = re.compile(r'^\s*>\s?(.*)$')
     lines = text.split('\n')
@@ -54,11 +56,11 @@ def _preprocess_callouts(text):
     while i < len(lines):
         m = marker_re.match(lines[i])
         if m and m.group(1).upper() in _CALLOUTS:
-            cls, label = _CALLOUTS[m.group(1).upper()]
+            cls, emoji, deflabel = _CALLOUTS[m.group(1).upper()]
+            custom = m.group(2).strip()
+            title = f'{emoji} {custom}' if custom else f'{emoji} {deflabel}'
+            title = title.replace('"', "'")
             body = []
-            extra = m.group(2).strip()
-            if extra:
-                body.append(extra)
             i += 1
             while i < len(lines):
                 qm = quote_re.match(lines[i])
@@ -66,7 +68,7 @@ def _preprocess_callouts(text):
                     break
                 body.append(qm.group(1))
                 i += 1
-            out.append(f'!!! {cls} "{label}"')
+            out.append(f'!!! {cls} "{title}"')
             for b in (body or ['']):
                 out.append(('    ' + b) if b.strip() else '')
             out.append('')
