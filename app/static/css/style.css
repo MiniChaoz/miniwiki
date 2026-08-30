@@ -191,6 +191,17 @@ table.data tr:last-child td { border-bottom: none; }
 .prose img { max-width: 100%; height: auto; border-radius: 8px; }
 .prose ul, .prose ol { padding-left: 1.5em; }
 
+/* Hinweis-/Troubleshooting-Boxen (Admonitions) */
+.prose .admonition { border-left: 4px solid var(--muted); border-radius: 8px; padding: 10px 16px; margin: 1.1em 0; background: var(--surface); }
+.prose .admonition-title { font-weight: 600; margin: .2em 0 .4em; }
+.prose .admonition > p { margin: .4em 0; }
+.prose .admonition > p:last-child { margin-bottom: 0; }
+.prose .admonition.note    { border-color: var(--info-fg);    background: var(--info-bg); }
+.prose .admonition.tip     { border-color: var(--success-fg); background: var(--success-bg); }
+.prose .admonition.warning { border-color: var(--warning-fg); background: var(--warning-bg); }
+.prose .admonition.danger  { border-color: var(--danger-fg);  background: var(--danger-bg); }
+.prose .admonition.trouble { border-color: var(--primary);    background: var(--info-bg); }
+
 /* Login */
 .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 30px 28px; }
 .login-title { text-align: center; margin: 0 0 4px; }

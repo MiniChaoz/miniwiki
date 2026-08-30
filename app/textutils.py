@@ -29,17 +29,65 @@ _ALLOWED_ATTRS = {
 _ALLOWED_PROTOCOLS = ['http', 'https', 'mailto', 'data']
 
 
+# Hinweis-/Callout-Boxen: geschrieben als Zitat mit Marker in der ersten Zeile,
+# z.B.  > [!WARNUNG]
+#       > Text ...
+_CALLOUTS = {
+    'HINWEIS': ('note', 'ℹ️ Hinweis'), 'NOTE': ('note', 'ℹ️ Hinweis'), 'INFO': ('note', 'ℹ️ Hinweis'),
+    'TIPP': ('tip', '💡 Tipp'), 'TIP': ('tip', '💡 Tipp'),
+    'WARNUNG': ('warning', '⚠️ Warnung'), 'WARNING': ('warning', '⚠️ Warnung'),
+    'ACHTUNG': ('danger', '⛔ Achtung'), 'CAUTION': ('danger', '⛔ Achtung'),
+    'DANGER': ('danger', '⛔ Achtung'), 'IMPORTANT': ('danger', '⛔ Wichtig'), 'WICHTIG': ('danger', '⛔ Wichtig'),
+    'TROUBLESHOOTING': ('trouble', '🔧 Troubleshooting'), 'PROBLEM': ('trouble', '🔧 Troubleshooting'),
+    'FEHLER': ('trouble', '🔧 Troubleshooting'),
+}
+
+
+def _preprocess_callouts(text):
+    """Wandelt Zitat-Marker (> [!WARNUNG]) in Admonition-Bloecke um, die die
+    Markdown-Engine sauber als getrennte Hinweis-Boxen rendert."""
+    marker_re = re.compile(r'^\s*>\s*\[!(\w+)\]\s*(.*)$')
+    quote_re = re.compile(r'^\s*>\s?(.*)$')
+    lines = text.split('\n')
+    out = []
+    i = 0
+    while i < len(lines):
+        m = marker_re.match(lines[i])
+        if m and m.group(1).upper() in _CALLOUTS:
+            cls, label = _CALLOUTS[m.group(1).upper()]
+            body = []
+            extra = m.group(2).strip()
+            if extra:
+                body.append(extra)
+            i += 1
+            while i < len(lines):
+                qm = quote_re.match(lines[i])
+                if qm is None:
+                    break
+                body.append(qm.group(1))
+                i += 1
+            out.append(f'!!! {cls} "{label}"')
+            for b in (body or ['']):
+                out.append(('    ' + b) if b.strip() else '')
+            out.append('')
+        else:
+            out.append(lines[i])
+            i += 1
+    return '\n'.join(out)
+
+
 def render_markdown(text):
     """Rendert Markdown zu bereinigtem, sicherem HTML."""
     if not text:
         return ''
     html = md_lib.markdown(
-        text,
+        _preprocess_callouts(text),
         extensions=[
             'fenced_code',
             'tables',
             'sane_lists',
             'nl2br',
+            'admonition',
             TocExtension(permalink=False),
         ],
         output_format='html5',
